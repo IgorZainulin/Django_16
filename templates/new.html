@@ -1,0 +1,37 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+   <h1></h1>
+   <h3>{{ time_now|date:'M d Y' }}</h3>
+   <!-- Если в переменной next_sale будет None,
+   то выведется указанный в фильтре текст -->
+   <h3> {{ next_sale|default_if_none:"Чуть позже сообщим о свежих новостях!" }} </h3>
+   <hr>
+   {% if new %}
+       <table>
+           <tr>
+               <td>Заголовок</td>
+               <td>Категории</td>
+               <td>Текст</td>
+               <td>Дата выпуска</td>
+           </tr>
+
+           <tr>
+               <td>{{ new.header }}</td>
+               <td>
+               {% for category in new.category.all %}
+                 {{ category }}
+               {% endfor %}
+               </td>
+               <td>{{ new.text }}</td>
+               <td>{{ new.create_time|date:'M d Y' }}</td>
+           </tr>
+       </table>
+   {% else %}
+       <h2>Новостей нет!</h2>
+   {% endif %}
+{% endblock content %}

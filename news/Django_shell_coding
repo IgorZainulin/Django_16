@@ -1,0 +1,124 @@
+1.Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+2.Создать два объекта модели Author, связанные с пользователями.
+3.Добавить 4 категории в модель Category.
+4.Добавить 2 статьи и 1 новость.
+5.Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+6.Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+7.Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+8.Обновить рейтинги пользователей.
+9.Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+10.Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
+11.Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+
+
+
+
+
+from news.models import *
+
+1)
+u1 = User.objects.create_user(username='Nika')
+
+u2 = User.objects.create_user(username='Igor')
+
+u2 = User.objects.create_user(username='Sofiya')
+
+
+2)
+a1 = Author.objects.create(user=u1)
+
+a2 = Author.objects.create(user=u2)
+
+
+3)
+categ1 = Category.objects.create(name='Politica')
+
+categ2 = Category.objects.create(name='Criminal')
+
+categ3 = Category.objects.create(name='Cultural')
+
+categ4 = Category.objects.create(name='Sports')
+
+
+4)
+ar1 = Post.objects.create(header='header', text='Принудительное лечение в медицинской организации, оказывающей психиатрическую помощь в ста
+ционарных условиях', positions='AR', author=a1)
+
+
+ar2 = Post.objects.create(header='header', text='В качестве свидетеля для дачи показаний может быть вызвано любое физическое лицо, которому
+ могут быть известны какие-либо обстоятельства, имеющие значение для осуществления налогового контроля', positions='AR', author=a1)
+
+
+ nw1 = Post.objects.create(header='header', text='Сегодня, 24 июня санкт-петербургский «Зенит» официально объявил о переходе крайнего защитн
+ика Юрия Горшкова из «Крыльев Советов». Соглашение с футболистом действует по схеме «3+1».', positions='NS', author=a2)
+
+
+
+Post.objects.get(pk=4).text
+'Принудительное лечение в медицинской организации, оказывающей психиатрическую помощь в стационарных условиях'
+
+
+
+5)
+cat1 = Category.objects.get(pk=1)
+cat2 = Category.objects.get(pk=2)
+cat4 = Category.objects.get(pk=4)
+
+
+post1 = Post.objects.get(pk=4)
+
+PostCategory.objects.create(post=post1, category=cat1)
+PostCategory.objects.create(post=post1, category=cat2)
+
+post2 = Post.objects.get(pk=5)
+
+PostCategory.objects.create(post=post2, category=cat1)
+PostCategory.objects.create(post=post2, category=cat2)
+
+post3 = Post.objects.get(pk=3)
+
+PostCategory.objects.create(post=post3, category=cat1)
+PostCategory.objects.create(post=post3, category=cat4)
+
+
+6)
+c1 = Comment.objects.create(comm_text='Спасибо', post=post1, user=a1.user)
+
+c2 = Comment.objects.create(comm_text='Хороших выходных', post=post1, user=a2.user)
+
+c3 = Comment.objects.create(comm_text='Вы согласны?х', post=post2, user=a1.user)
+
+c4 = Comment.objects.create(comm_text='А что вы думаете по этому поводу?', post=post3, user=a2.user)
+
+
+7) и 8)
+post1.like()
+a1.update_rating()
+a1.rating
+
+
+c1.like()
+a1.update_rating()
+a1.rating
+
+
+c2.dislike()
+a1.update_rating()
+a1.rating
+
+
+9)
+Author.objects.order_by('-rating').values('user__username', 'rating').first()
+
+
+10)
+post_best = Post.objects.order_by('-rating').first()
+post_best.author.user.username
+post_best.create_time
+post_best.rating
+post_best.header
+post_best.preview()
+
+
+11)Comment.objects.filter(post=post_best).values('create_time', 'user__username', 'rating', 'comm_text')
+
